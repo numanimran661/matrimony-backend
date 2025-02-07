@@ -95,7 +95,7 @@ router.post(
   uploadFileController.uploadFile
 );
 
-router.post("/admin/create-user", adminDashController.createUser);
+router.post("/admin/create-user", isAuthenticated, adminDashController.createUser);
 router.put("/admin/edit-user/:id",isAuthenticated, adminDashController.editUser);
 router.post("/admin/add-success-story",isAuthenticated , adminDashController.addSuccessStory);
 router.get("/admin/get-success-stories",isAuthenticated, adminDashController.getSuccessStories);
