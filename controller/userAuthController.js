@@ -11,10 +11,10 @@ const { sendchatNotification } = require("../firebase/service/index.js");
 const jwt = require("jsonwebtoken");
 const user = require("../models/user.js");
 const admin = require('firebase-admin');
-const serviceAccount = require('../vaishakhi-matrimony-firebase-adminsdk-mjr6h-33d857fb90.json'); // Replace with the path to your Firebase service account key file
+const serviceAccount = require('../vaishakhi-matrimony-firebase-adminsdk-mjr6h-8a04990997.json'); // Replace with the path to your Firebase service account key file
 
 if (!admin.apps.length) {
-  const serviceAccount = require('../../vaishakhi-matrimony-firebase-adminsdk-mjr6h-33d857fb90.json');
+  const serviceAccount = require('../../vaishakhi-matrimony-firebase-adminsdk-mjr6h-8a04990997.json');
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     // If you're using other Firebase services, include their configs here
@@ -410,6 +410,7 @@ const userAuthController = {
   async completeProfile(req, res, next) {
     try {
       const userSchema = Joi.object({
+        fullName: Joi.string().required(),
         gender: Joi.string().valid("male", "female").required(),
         dateOfBirth: Joi.string().required(),
         occupation: Joi.string().required(),
@@ -460,11 +461,11 @@ const userAuthController = {
           manglik: Joi.string().required(),
         }),
         FamilyDetails: Joi.object({
-          numOfBrothers: Joi.string().required(),
-          numOfMarriedBrothers: Joi.string().required(),
-          numOfSisters: Joi.string().required(),
-          numOfMarriedSisters: Joi.string().required(),
-          country: Joi.string().required(),
+          // numOfBrothers: Joi.string().required(),
+          // numOfMarriedBrothers: Joi.string().required(),
+          // numOfSisters: Joi.string().required(),
+          // numOfMarriedSisters: Joi.string().required(),
+          // country: Joi.string().required(),
           state: Joi.string().required(),
           city: Joi.string().required(),
         }),
@@ -574,10 +575,10 @@ const userAuthController = {
       }
   
       const {
-          phone, name, dateOfBirth, userImages, email, gender, height, city, motherTongue,drinking, partnerExpectation, highestDegree, occupation, maritalStatus, employedIn, annualIncome, numOfSisters, numOfMarriedSisters, numOfBrothers, numOfMarriedBrothers, country, state, education, income, fathersOccupation, familyValue, familyStatus, familyType, smoking, food, physicalStatus, lookingFor, heightFrom, heightTo, ageFrom, ageTo, dosh, star, birthTime, birthPlace, religion, caste, sect, manglik,
+          phone, age, workLocation, name, dateOfBirth, userImages, email, gender, height, city, motherTongue,drinking, partnerExpectation, highestDegree, occupation, maritalStatus, employedIn, annualIncome, numOfSisters, numOfMarriedSisters, numOfBrothers, numOfMarriedBrothers, country, state, education, income, fathersOccupation, familyValue, familyStatus, familyType, smoking, food, physicalStatus, lookingFor, heightFrom, heightTo, ageFrom, ageTo, dosh, star, birthTime, birthPlace, religion, caste, sect, manglik,
       } = req.body;
 
-      console.log(req.body.userImages,"jdsjshakjhdafkjhaghahggdg");
+      console.log(req.body,"jdsjshakjhdafkjhaghahggdg");
       const userId = req.user._id;
   
       const user = await User.findById(userId);
@@ -595,6 +596,7 @@ const userAuthController = {
       if (userImages) user.userImages = userImages;
       if (email) user.email = email;
       if (gender) user.gender = gender;
+      if (age) user.age = age;
       if (height) user.height = height;
       if (city) user.city = city;
       if (motherTongue) user.motherTongue = motherTongue;
@@ -604,6 +606,7 @@ const userAuthController = {
       if (maritalStatus) user.maritalStatus = maritalStatus;
       if (employedIn) user.employedIn = employedIn;
       if (annualIncome) user.annualIncome = annualIncome;
+      if (workLocation) user.workLocation = workLocation;
       if (ageFrom) user.ageFrom = ageFrom;
       if (ageTo) user.ageTo = ageTo;
       if (heightFrom) user.heightFrom = heightFrom;

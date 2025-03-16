@@ -99,6 +99,11 @@ router.get("/user/getSavedUsers", auth, userMatchController.getSavedUsers);
 
 //................................Chat..................................//
 //
+router.post(
+  "/user/createConversation",
+  auth,
+  chatController.createConversation
+);
 router.get(
   "/user/getAllConversation",
   auth,

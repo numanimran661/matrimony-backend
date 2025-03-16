@@ -23,6 +23,7 @@ const userMatchController = {
       const userGender = user.gender;
       const gender = userGender === "male" ? "female" : "male";
       const matchType = req.query.matchType;
+      
   
       const {
         partnerAge,
