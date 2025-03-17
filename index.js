@@ -1,4 +1,4 @@
-const express = require("express"); 
+const express = require("express");
 const app = express();
 require("dotenv").config();
 const http = require("http");
@@ -25,7 +25,8 @@ const allowedOrigins = [
   "https://vaishakhimatrimony.com",
   "https://www.vaishakhimatrimony.com",
   "https://api.vaishakhimatrimony.com",
-  "https://admin.vaishakhimatrimony.com"
+  "https://admin.vaishakhimatrimony.com",
+  'https://vaishakhi-matrimony.vercel.app',
 ];
 
 // CORS Middleware

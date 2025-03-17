@@ -27,6 +27,7 @@ const allowedOrigins = [
   'https://www.vaishakhimatrimony.com',
   'https://api.vaishakhimatrimony.com',
   'https://admin.vaishakhimatrimony.com',
+  'https://vaishakhi-matrimony.vercel.app',
   'http://localhost:3000',
   'http://localhost:3002',
 ];
