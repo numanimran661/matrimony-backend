@@ -11,10 +11,10 @@ const { sendchatNotification } = require("../firebase/service/index.js");
 const jwt = require("jsonwebtoken");
 const user = require("../models/user.js");
 const admin = require('firebase-admin');
-const serviceAccount = require('../vaishakhi-matrimony-firebase-adminsdk-mjr6h-8a04990997.json'); // Replace with the path to your Firebase service account key file
+const serviceAccount = require('../vaishakhi-matrimony-firebase-adminsdk-mjr6h-8c5dbe20bf.json'); // Replace with the path to your Firebase service account key file
 
 if (!admin.apps.length) {
-  const serviceAccount = require('../../vaishakhi-matrimony-firebase-adminsdk-mjr6h-8a04990997.json');
+  const serviceAccount = require('../vaishakhi-matrimony-firebase-adminsdk-mjr6h-8c5dbe20bf.json');
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     // If you're using other Firebase services, include their configs here
