@@ -194,6 +194,7 @@ const userAuthController = {
     if (error) {
         return next(error);
     }
+    
 
     try {
         const userRecord = await admin.auth().getUserByEmail(userEmail);
