@@ -132,7 +132,7 @@ router.get("/user/get-success-storie/:id",adminDashController.getSuccessStorybyI
 
 
 // ---------------------user details----------------------
-router.post("/user/contact-us", auth, userAuthController.contactUs)
+router.post("/user/contact-us", userAuthController.contactUs)
 
 
 module.exports = router;
