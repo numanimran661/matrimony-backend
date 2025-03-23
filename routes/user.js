@@ -131,4 +131,8 @@ router.get("/user/get-success-stories",auth,adminDashController.getSuccessStorie
 router.get("/user/get-success-storie/:id",adminDashController.getSuccessStorybyId);
 
 
+// ---------------------user details----------------------
+router.post("/user/contact-us", auth, userAuthController.contactUs)
+
+
 module.exports = router;

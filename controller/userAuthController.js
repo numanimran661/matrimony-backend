@@ -10,6 +10,8 @@ const AccessToken = require("../models/accessToken.js");
 const { sendchatNotification } = require("../firebase/service/index.js");
 const jwt = require("jsonwebtoken");
 const user = require("../models/user.js");
+const Contact = require("../models/contact.js");
+const nodemailer = require("nodemailer");
 const admin = require('firebase-admin');
 const serviceAccount = require('../vaishakhi-matrimony-firebase-adminsdk-mjr6h-8c5dbe20bf.json'); // Replace with the path to your Firebase service account key file
 
@@ -848,6 +850,69 @@ const userAuthController = {
       res.status(401).json({ success: false, message: "User not found" });
     } else {
       res.status(200).json({ data:req.user, success: true });
+    }
+  },
+
+  
+  //.......................................Contact us..................................//
+
+  async contactUs(req, res, next) {
+    const contactSchema = Joi.object({
+      name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      phone: Joi.string().required(),
+      message: Joi.string().required(),
+    });
+
+    const { error } = contactSchema.validate(req.body);
+    if (error) {
+      return next(error);
+    }
+
+    const { name, email, phone, message } = req.body;
+
+    try {
+      const contactEntry = new Contact({
+        name,
+        email,
+        phone,
+        message,
+      });
+
+      await contactEntry.save();
+
+      // Sending email notification (optional)
+      let transporter = nodemailer.createTransport({
+        host: "smtp.hostinger.com",
+        port: 587,
+        secure: false,
+        auth: {
+          user: "info@vaishakhimatrimony.com", // Your email
+          pass: "Temp@12345", // Your email password
+        },
+      });
+
+      let mailOptions = {
+        from: "info@vaishakhimatrimony.com",
+        to: "numanimran661@gmail.com", // Admin email
+        subject: "New Contact Us Submission",
+        text: `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\nMessage: ${message}`,
+      };
+
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          console.error("Error sending email:", err);
+        } else {
+          console.log("Email sent successfully:", info.response);
+        }
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: "Your message has been received. We will contact you soon.",
+      });
+    } catch (error) {
+      return next(error);
     }
   },
 };
