@@ -14,33 +14,21 @@ const createOrder = async (req, res) => {
     Cashfree.XClientId = process.env.CASHFREE_KEY_ID;
     Cashfree.XClientSecret = process.env.CASHFREE_KEY_SECRET;
     Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
-    // var request = {
-    //   "order_amount": amount,
-    //   "order_currency": "INR",
-    //   "customer_details": {
-    //     "customer_id": customer_name,
-    //     "customer_name": customer_name,
-    //     "customer_email": customer_email,
-    //     "customer_phone": customer_phone,
-    //     "customer_country": "IN",
-    //   },
-    //   "order_meta": {
-    //     "return_url": "https://test.cashfree.com/pgappsdemos/return.php?order_id=order_123"
-    //   },
-    //   "order_note": ""
-    // }
+    console.log(process.env.CASHFREE_KEY_ID, process.env.CASHFREE_KEY_SECRET, Cashfree);
+    
     var request = {
       "order_amount": amount,
       "order_currency": "INR",
       "customer_details": {
-        "customer_id": "node_sdk_test",
-        "customer_name": "test user",
-        "customer_email": "example@gmail.com",
-        "customer_phone": "9312341234",
+        "customer_id": customer_id,
+        "customer_name": customer_name,
+        "customer_email": customer_email,
+        "customer_phone": customer_phone,
         "customer_country": "IN",
       },
+      "payment_methods": ["cc", "nb"],
       "order_meta": {
-        "return_url": "https://test.cashfree.com/pgappsdemos/return.php?order_id=order_123"
+        "return_url": "https://vaishakhimatrimony.com/membership-plans/order-status?order_id=order_123"
       },
       "order_note": ""
     }
