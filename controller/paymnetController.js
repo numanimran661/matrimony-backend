@@ -3,10 +3,18 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const Order = require("../models/order");
+const crypto = require("crypto");
 const { Cashfree } = require('cashfree-pg')
 
 
+function generateOrderId() {
+  const uniqueId = crypto.randomBytes(16).toString("hex")
 
+  const hash = crypto.createHash("sha256")
+  hash.update(uniqueId)
+  const orderId = hash.digest('hex')
+  return orderId.substr(0, 12)
+}
 
 const createOrder = async (req, res) => {
   const { amount, customer_name, customer_id, customer_phone, customer_email } = req.body
@@ -15,10 +23,11 @@ const createOrder = async (req, res) => {
     Cashfree.XClientSecret = process.env.CASHFREE_KEY_SECRET;
     Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
     console.log(process.env.CASHFREE_KEY_ID, process.env.CASHFREE_KEY_SECRET, Cashfree);
-    
+
     var request = {
       "order_amount": amount,
       "order_currency": "INR",
+      "order_id": await generateOrderId(),
       "customer_details": {
         "customer_id": customer_id,
         "customer_name": customer_name,
@@ -26,13 +35,13 @@ const createOrder = async (req, res) => {
         "customer_phone": customer_phone,
         "customer_country": "IN",
       },
-      "payment_methods": ["cc", "nb"],
+      "payment_methods": ["cc", "nb", "upi", "wallet", "emi", "paylater", "cardless_emi", "credit_line"],
       "order_meta": {
-        "return_url": "https://vaishakhimatrimony.com/membership-plans/order-status?order_id=order_123"
+        "return_url": "https://vaishakhimatrimony.com/membership-plans"
       },
       "order_note": ""
     }
-    
+
 
     const response = await Cashfree.PGCreateOrder('2023-08-01', request);
     res.status(200).json(response.data);
@@ -43,11 +52,61 @@ const createOrder = async (req, res) => {
 }
 const verifyPayment = async (req, res) => {
   let version = "2023-08-01"
-  Cashfree.PGFetchOrder(version, "<order_id>").then((response) => {
+  const {
+    order_id,
+    membership,
+    userId,
+  } = req.body;
+  try {
+    const response = await Cashfree.PGFetchOrder(version, order_id)
     console.log('Order fetched successfully:', response.data);
-  }).catch((error) => {
+    if (response?.data) {
+      if (
+        !mongoose.Types.ObjectId.isValid(userId) ||
+        !mongoose.Types.ObjectId.isValid(membership)
+      ) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid userId or membership" });
+      }
+
+      try {
+        // Create order record in database
+        const newOrder = await Order.create({
+          membership: mongoose.Types.ObjectId(membership),
+          userId: mongoose.Types.ObjectId(userId),
+          orderId: order_id,
+        });
+
+        // Update user membership and order history
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          {
+            membership: mongoose.Types.ObjectId(membership),
+            isPaid: true,
+            $push: { orders: newOrder._id },
+          },
+          { new: true }
+        ); // Ensure to get the updated document back
+
+        if (!updatedUser) {
+          return res
+            .status(404)
+            .json({ success: false, message: "User not found" });
+        }
+        return res.status(200).json({ success: true, newOrder, user: updatedUser });
+      } catch (error) {
+        console.error("Error updating user membership:", error);
+        return res.status(500).json({ success: false, error: error.message });
+      }
+    }
+    res.status(200).json(response.data);
+
+  } catch (error) {
     console.error('Error:', error.response.data.message);
-  });
+    res.status(500).json({ error: error.response.data.message });
+
+  }
 }
 
 
