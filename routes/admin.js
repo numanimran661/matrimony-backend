@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const adminDashController = require("../controller/dashboardController");
+const dropdownController = require("../controller/dropdownController");
 const { isAuthenticated } = require("../middlewares/auth");
 const uploadFileController = require("../controller/uploadFileController");
 const multer = require("multer");
@@ -100,5 +101,12 @@ router.put("/admin/edit-user/:id",isAuthenticated, adminDashController.editUser)
 router.post("/admin/add-success-story",isAuthenticated , adminDashController.addSuccessStory);
 router.get("/admin/get-success-stories",isAuthenticated, adminDashController.getSuccessStories);
 router.delete("/admin/delete-success-story/:id",isAuthenticated , adminDashController.deleteSuccessStory);
+
+
+// New Dropdown Options Endpoints
+router.get('/admin/get-dropdown-options/:type', isAuthenticated, dropdownController.getOptionsByType);
+router.post('/admin/add-dropdown-option', isAuthenticated, dropdownController.addOption);
+router.put('/admin/update-dropdown-option/:id', isAuthenticated, dropdownController.updateOption);
+router.delete('/admin/delete-dropdown-option/:id', isAuthenticated, dropdownController.deleteOption);
 
 module.exports = router;

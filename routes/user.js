@@ -13,6 +13,7 @@ const adminDashController = require("../controller/dashboardController");
 const chatController = require("../controller/chatController");
 const router = express.Router();
 const path = require('path');
+const dropdownController = require("../controller/dropdownController");
 // const upload = multer({ dest: "/temp" });
 
 const storage = multer.diskStorage({
@@ -134,5 +135,8 @@ router.get("/user/get-success-storie/:id",adminDashController.getSuccessStorybyI
 // ---------------------user details----------------------
 router.post("/user/contact-us", userAuthController.contactUs)
 
+
+// ---------------------Get dropdown Options list----------------------
+router.get('/user/get-dropdown-options/:type', dropdownController.getOptionsByType);
 
 module.exports = router;
