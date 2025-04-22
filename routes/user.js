@@ -138,5 +138,6 @@ router.post("/user/contact-us", userAuthController.contactUs)
 
 // ---------------------Get dropdown Options list----------------------
 router.get('/user/get-dropdown-options/:type', dropdownController.getOptionsByType);
+router.get('/user/get-all-dropdown-options', dropdownController.getOptionsOfAllTypes);
 
 module.exports = router;
