@@ -250,13 +250,13 @@ const userAuthController = {
     let user;
 
     try {
-      const userRecord = await auth.getUserByEmail(email);
-      if (!userRecord) {
-        return res.status(404).json({ message: "Email not exsit!" });
-      }
-      const uid = userRecord.uid;
+      // const userRecord = await auth.getUserByEmail(email);
+      // if (!userRecord) {
+      //   return res.status(404).json({ message: "Email not exsit!" });
+      // }
+      // const uid = userRecord.uid;
 
-      await auth.updateUser(uid, { password: password });
+      // await auth.updateUser(uid, { password: password });
       user = await User.findOne({ email: email });
 
       if (!user) {
