@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const resetTokenSchema = new mongoose.Schema({
-    token: String,
-    email: String,
-    userType: String
+    email: { type: String, required: true },
+    otp: { type: String, required: true },
+    expiresAt: { type: Date, required: true },
 });
 
 // Create a model for the reset tokens collection

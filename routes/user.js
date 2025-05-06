@@ -31,6 +31,8 @@ router.post("/user/register", userAuthController.register);
 router.post("/user/login", userAuthController.login);
 router.post("/user/changePassword", userAuthController.changePassword);
 router.post("/user/forgotPassword", userAuthController.forgotPassword);
+router.post("/user/verify-otp", userAuthController.verifyResetOTP);
+router.post("/user/resetPassword", userAuthController.resetPassword);
 router.post("/user/deleteAccount", userAuthController.deleteAccount);
 router.post("/user/socialLogin", userAuthController.socialLogin);
 router.post(
@@ -127,9 +129,9 @@ router.post("/user/userPreferences/", auth, userAuthController.userPreferences);
 router.get("/user/profile", auth, userAuthController.userProfile);
 
 router.get('/user/current-user', auth, userAuthController.currentUser)
-router.get("/user/search",userAuthController.searchUsers);
-router.get("/user/get-success-stories",auth,adminDashController.getSuccessStories);
-router.get("/user/get-success-storie/:id",adminDashController.getSuccessStorybyId);
+router.get("/user/search", userAuthController.searchUsers);
+router.get("/user/get-success-stories", auth, adminDashController.getSuccessStories);
+router.get("/user/get-success-storie/:id", adminDashController.getSuccessStorybyId);
 
 
 // ---------------------user details----------------------

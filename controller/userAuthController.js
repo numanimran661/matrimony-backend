@@ -6,6 +6,7 @@ const User = require("../models/user.js");
 const JWTService = require("../services/JWTService.js");
 const RefreshToken = require("../models/token.js");
 const Subscription = require("../models/subscribtion.js");
+const ResetToken = require("../models/resetToken.js")
 const AccessToken = require("../models/accessToken.js");
 const { sendchatNotification } = require("../firebase/service/index.js");
 const jwt = require("jsonwebtoken");
@@ -14,6 +15,7 @@ const Contact = require("../models/contact.js");
 const nodemailer = require("nodemailer");
 const admin = require('firebase-admin');
 const serviceAccount = require('../vaishakhi-matrimony-firebase-adminsdk-mjr6h-8c5dbe20bf.json'); // Replace with the path to your Firebase service account key file
+const resetToken = require("../models/resetToken.js");
 
 if (!admin.apps.length) {
   const serviceAccount = require('../vaishakhi-matrimony-firebase-adminsdk-mjr6h-8c5dbe20bf.json');
@@ -232,50 +234,144 @@ const userAuthController = {
       res.status(500).send("Server Error");
     }
   },
-  async forgotPassword(req, res, next) {
-    // const userId = req.query.id;
+  // async forgotPassword(req, res, next) {
+  //   // const userId = req.query.id;
 
-    const userChangePasswordSchema = Joi.object({
+  //   const userChangePasswordSchema = Joi.object({
+  //     email: Joi.string().required(),
+  //     password: Joi.string().required(),
+  //   });
+  //   const { error } = userChangePasswordSchema.validate(req.body);
+
+  //   if (error) {
+  //     return next(error);
+  //   }
+
+  //   const { email, password } = req.body;
+
+  //   let user;
+
+  //   try {
+  //     // const userRecord = await auth.getUserByEmail(email);
+  //     // if (!userRecord) {
+  //     //   return res.status(404).json({ message: "Email not exsit!" });
+  //     // }
+  //     // const uid = userRecord.uid;
+
+  //     // await auth.updateUser(uid, { password: password });
+  //     user = await User.findOne({ email: email });
+
+  //     if (!user) {
+  //       return res.status(404).json({ message: "User not found" });
+  //     }
+
+  //     // const isMatch = await bcrypt.compare(password, user.password);
+  //     // if (!isMatch) {
+  //     //   return res.status(400).json({ message: "Invalid current password" });
+  //     // }
+
+  //     const hashedPassword = await bcrypt.hash(password, 10);
+  //     user.password = hashedPassword;
+  //     await user.save();
+
+  //     res.json({ message: "Password changed successfully" });
+  //   } catch (err) {
+  //     console.error(err.message);
+  //     res.status(500).send("Server Error");
+  //   }
+  // },
+  
+  async forgotPassword(req, res, next) {
+    const { email } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ status: false, message: "User not found" });
+      }
+  
+      const otp = Math.floor(1000 + Math.random() * 9000).toString();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+  
+      const token = await resetToken.findOneAndUpdate(
+        { email },
+        { otp, expiresAt },
+        { upsert: true, new: true }
+      );
+      
+  
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: {
+          user: '18cr231@gmail.com', // your email address
+          pass: 'ybul ovxm fssz rhst' // your app password
+        },
+      });
+  
+      await transporter.sendMail({
+        from: "18cr231@gmail.com",
+        to: email,
+        subject: "Password Reset OTP",
+        text: `Your OTP for password reset is ${otp}.\nRequested at ${new Date().toLocaleString()}`,
+      });
+  
+      return res.status(200).json({ status: true, message: "OTP sent to email" });
+    } catch (error) {
+      return next(error);
+    }
+  },
+  
+  // Verify OTP
+  async verifyResetOTP(req, res, next) {
+    const { email, otp } = req.body;
+    try {
+      const token = await resetToken.findOne({ email });
+      console.log(token);
+      
+  
+      if (!token || token.expiresAt < new Date()) {
+        return res.status(400).json({ status: false, message: "Invalid or expired OTP" });
+      }
+  
+      return res.status(200).json({ status: true, message: "OTP verified" });
+    } catch (error) {
+      return next(error);
+    }
+  },
+  
+  // Reset password
+  async resetPassword(req, res, next) {
+    const { email, otp, password } = req.body;
+    const resetPasswordSchema = Joi.object({
       email: Joi.string().required(),
+      otp: Joi.string().required(),
+      // password: Joi.string().pattern(passwordPattern).required(),
       password: Joi.string().required(),
     });
-    const { error } = userChangePasswordSchema.validate(req.body);
+
+    const { error } = resetPasswordSchema.validate(req.body);
 
     if (error) {
       return next(error);
     }
-
-    const { email, password } = req.body;
-
-    let user;
-
     try {
-      // const userRecord = await auth.getUserByEmail(email);
-      // if (!userRecord) {
-      //   return res.status(404).json({ message: "Email not exsit!" });
-      // }
-      // const uid = userRecord.uid;
+      const token = await resetToken.findOne({ email });
 
-      // await auth.updateUser(uid, { password: password });
-      user = await User.findOne({ email: email });
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
+      console.log(token, email, otp);
+      
+  
+      if (!token || token.expiresAt < new Date()) {
+        return res.status(400).json({ status: false, message: "Invalid or expired OTP" });
       }
-
-      // const isMatch = await bcrypt.compare(password, user.password);
-      // if (!isMatch) {
-      //   return res.status(400).json({ message: "Invalid current password" });
-      // }
-
+  
       const hashedPassword = await bcrypt.hash(password, 10);
-      user.password = hashedPassword;
-      await user.save();
-
-      res.json({ message: "Password changed successfully" });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Server Error");
+      await User.updateOne({ email }, { password: hashedPassword });
+      await resetToken.deleteOne({ email }); // remove used OTP
+  
+      return res.status(200).json({ status: true, message: "Password reset successful" });
+    } catch (error) {
+      return next(error);
     }
   },
 
