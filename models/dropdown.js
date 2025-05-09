@@ -9,6 +9,11 @@ const dropdownOptionSchema = new mongoose.Schema({
   value: {
     type: String,
     required: true
+  },
+  parentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'DropdownOption',
+    default: null,
   }
 }, { timestamps: true });
 

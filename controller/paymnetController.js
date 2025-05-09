@@ -21,7 +21,7 @@ const createOrder = async (req, res) => {
   try {
     Cashfree.XClientId = process.env.CASHFREE_KEY_ID;
     Cashfree.XClientSecret = process.env.CASHFREE_KEY_SECRET;
-    Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
+    Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION;
     console.log(process.env.CASHFREE_KEY_ID, process.env.CASHFREE_KEY_SECRET, Cashfree);
 
     var request = {

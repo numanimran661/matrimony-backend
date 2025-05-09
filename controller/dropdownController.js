@@ -3,8 +3,8 @@ const DropdownOption = require('../models/dropdown');
 const dropdownController = {
   async addOption(req, res) {
     try {
-      const { type, value } = req.body;
-      const option = new DropdownOption({ type, value });
+      const { type, value, parentId } = req.body;
+      const option = new DropdownOption({ type, value, parentId });
       await option.save();
       res.status(201).json({ success: true, option });
     } catch (err) {

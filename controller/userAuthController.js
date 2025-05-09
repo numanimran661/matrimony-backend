@@ -283,6 +283,15 @@ const userAuthController = {
   
   async forgotPassword(req, res, next) {
     const { email } = req.body;
+    const forgotPassSchema = Joi.object({
+      email: Joi.string().required(),
+    });
+
+    const { error } = forgotPassSchema.validate(req.body);
+
+    if (error) {
+      return next(error);
+    }
     try {
       const user = await User.findOne({ email });
       if (!user) {
@@ -300,17 +309,17 @@ const userAuthController = {
       
   
       const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
+        host: 'smtp.hostinger.com',
+        port: 587,
+        secure: false,
         auth: {
-          user: '18cr231@gmail.com', // your email address
-          pass: 'ybul ovxm fssz rhst' // your app password
+          user: 'info@vaishakhimatrimony.com', // your email address
+          pass: 'K0U$uH!K28' // your app password
         },
       });
   
       await transporter.sendMail({
-        from: "18cr231@gmail.com",
+        from: "info@vaishakhimatrimony.com",
         to: email,
         subject: "Password Reset OTP",
         text: `Your OTP for password reset is ${otp}.\nRequested at ${new Date().toLocaleString()}`,
@@ -325,6 +334,16 @@ const userAuthController = {
   // Verify OTP
   async verifyResetOTP(req, res, next) {
     const { email, otp } = req.body;
+    const verifyOtpSchema = Joi.object({
+      email: Joi.string().required(),
+      otp: Joi.string().required(),
+    });
+
+    const { error } = verifyOtpSchema.validate(req.body);
+
+    if (error) {
+      return next(error);
+    }
     try {
       const token = await resetToken.findOne({ email });
       console.log(token);
