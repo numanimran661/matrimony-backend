@@ -602,7 +602,8 @@ const dashboardController = {
       if (!updatedUser) {
         return res.status(404).json({ success: false, message: "User not found" });
       }
-
+      updatedUser.profileCompleted = true;
+      await updatedUser.save()
       res.status(200).json({ success: true, message: "User updated successfully", user: updatedUser });
     } catch (error) {
       console.error("Error updating user:", error);
