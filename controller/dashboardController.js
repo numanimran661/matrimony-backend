@@ -579,6 +579,7 @@ const dashboardController = {
         Education,
         partnerExpectation
       });
+      newUser.profileCompleted = true;
 
       await newUser.save();
 
