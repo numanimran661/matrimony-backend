@@ -443,7 +443,7 @@ const userAuthController = {
 
   async socialLogin(req, res, next) {
     const userLoginSchema = Joi.object({
-      email: Joi.string().min(5).max(40).required(),
+      email: Joi.string().min(1).max(45).required(),
       // password: Joi.string().required(),
       fcmToken: Joi.string(),
     });
