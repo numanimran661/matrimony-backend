@@ -17,7 +17,7 @@ cron.schedule("0 * * * *", async () => {
     const now = new Date();
     const result = await User.updateMany(
       { membershipExpiry: { $lte: now } },
-      { $set: { membershipId: null } }
+      { $set: { membership: null, membershipExpiry: null, isPaid: false } }
     );
     console.log(`Updated ${result.nModified} expired memberships.`);
   } catch (err) {
@@ -706,7 +706,7 @@ const dashboardController = {
     try {
       const { id } = req.params;
       const singleStory = await SuccessStory.findById(id);
-      res.status(200).json({ success: true, singleStory});
+      res.status(200).json({ success: true, singleStory });
     } catch (error) {
       console.error("Error fetching success stories:", error);
       res.status(500).json({ success: false, message: "Error fetching success stories", error: error.message });
