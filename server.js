@@ -18,6 +18,7 @@ const {
 const { sendchatNotification } = require("./firebase/service");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
+const { setSocketIO } = require("./config/socketManager");
 
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(express.json({ limit: "50mb" }));
@@ -77,9 +78,15 @@ const io = new Server(server, {
   }
 });
 
+setSocketIO(io)
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
 
+  socket.on("join_user_channel", (userId) => {
+    socket.join(userId);
+    console.log(`User with ID: ${socket.id} joined user room: ${userId}`);
+    socket.emit("joined_user_channel", { userId, socketId: socket.id });
+  });
   socket.on("join_room", (data) => {
     socket.join(data);
     console.log(`User with ID: ${socket.id} joined room: ${data}`);
@@ -112,6 +119,7 @@ io.on("connection", (socket) => {
     console.log("User Disconnected", socket.id);
   });
 });
+
 
 app.get("/", (req, res) => {
   res.json({ version: "1.0.0:latest" });

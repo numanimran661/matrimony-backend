@@ -7,6 +7,7 @@ const { defaultMaxListeners } = require("nodemailer/lib/xoauth2/index.js");
 const cron = require("node-cron");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { getSocketIO } = require("../config/socketManager.js");
 const SECRET_KEY = "admin"; // Use a strong secret key
 // Schedule a job to run every hour
 
@@ -15,11 +16,32 @@ const maxAge = Date.now() + 24 * 3 * 60 * 60 * 1000;
 cron.schedule("0 * * * *", async () => {
   try {
     const now = new Date();
-    const result = await User.updateMany(
-      { membershipExpiry: { $lte: now } },
-      { $set: { membership: null, membershipExpiry: null, isPaid: false } }
-    );
-    console.log(`Updated ${result.nModified} expired memberships.`);
+    const expiredUsers = await User.find({ membershipExpiry: { $lte: now } });
+
+    const io = getSocketIO();
+    
+    if (!io) {
+      console.error("Socket IO instance not available");
+    }
+    for (const user of expiredUsers) {
+      user.membership = null;
+      user.membershipExpiry = null;
+      user.isPaid = false;
+      await user.save();
+
+      // Emit socket event to this user
+      io.to(user._id.toString()).emit("subscription_expired", {
+        message: "Your subscription has expired.",
+      });
+      console.log(`Emitted expiry event for user ${user._id.toString()}`);
+    }
+
+
+    // const result = await User.updateMany(
+    //   { membershipExpiry: { $lte: now } },
+    //   { $set: { membership: null, membershipExpiry: null, isPaid: false } }
+    // );
+    // console.log(`Updated ${result.nModified} expired memberships.`);
   } catch (err) {
     console.error("Error updating expired memberships:", err);
   }
